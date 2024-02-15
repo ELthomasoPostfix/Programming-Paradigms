@@ -2,7 +2,7 @@
 
 # Haskell
 
-For this part of the assignment, **5 questions** out of 14 unique questions of the AoC 2023 questions should be solved in Haskell. The questions solved in Haskell may not be submitted for the Prolog assignment as well.
+For this part of the assignment, **5 questions** out of 25 unique questions of the AoC 2023 questions should be solved in Haskell. The questions solved in Haskell may not be submitted for the Prolog assignment as well.
 
 ## Installation
 
