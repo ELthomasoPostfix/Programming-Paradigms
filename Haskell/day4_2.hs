@@ -4,7 +4,7 @@ import Data.Char
 
 
 main = do
-    contents <- readFile "AoC_question_4.txt"
+    contents <- readFile "day4.txt"
     print (computeTotalValue (lines contents) [])
     return ()
 
