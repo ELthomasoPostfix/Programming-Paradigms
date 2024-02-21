@@ -32,9 +32,8 @@ parseNumList (head:xs) numCarry
 --      1) The sub-list of values that did NOT fit the given range, and so remain untransformed
 --      2) The sub-list of transformed values, according to the range mapping
 -- Params:
---      1) The range to filter/transform with, of the form (destination range start, source range start, range length),
---         also called the intermediates list
---      2) The list of values to filter/transform
+--      1) The range to transform with, of the form (destination range start, source range start, range length)
+--      2) The list of values to transform
 transformByRange :: (Int, Int, Int) -> [Int] -> ([Int], [Int])
 transformByRange range@(rangeStartDest, rangeStartSrc, rangelen) soonToBeLocations =
     (untransformed, transformed)
