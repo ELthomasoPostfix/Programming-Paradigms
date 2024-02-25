@@ -54,3 +54,11 @@ To extract the answer to part 2 of the problem, a query of the following form sh
 ```
 
 where `StartAtoms` represents a list containing ALL nodes of the form `??a` and `StepCount` resolves to the amount of steps for all start atoms in the initial list to reach `??z` using the required movement pattern. The code has hardcoded into it that a node of the form `??z` as a final/terminal node.
+
+If **debugging** is wanted for part 2 in SWISH Prolog, an alternative query can provide at-runtime trace tracking:
+
+```Prolog
+?- trace,
+   get_start_atoms(StartAtoms),
+   follow_path_multi(StartAtoms, [], StepCount)
+```
