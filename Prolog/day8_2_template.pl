@@ -48,7 +48,7 @@ advance_nodes(CurrentNodes, LRRule, AdvancedNodes) :-
 
 
 
-% Base case: ??z is the terminal node, and zzz can be reached from zzz in zero steps.
+% Base case: ??z is the terminal node, and ??z can be reached from ??z in zero steps.
 follow_path_multi(CurrentNodes, _, 0) :-
     forall(member(CurrNode, CurrentNodes), is_end_atom(CurrNode)).
 % Recursive cases: find a path from the list of current nodes to some list of terminal nodes,
@@ -57,7 +57,8 @@ follow_path_multi(CurrentNodes, _, 0) :-
 % Prevent infinite recursion: if EVERY left(CurrNode) or right(CurrNode) is a self loop, then backtrack.
 % Provide the path length as output through the third parameter. The following SO post served as inspiration: https://stackoverflow.com/questions/47366029/prolog-recursion-length-count
 follow_path_multi(CurrentNodes, [], PathLength) :-
-    next_moves([], ResetMoves), follow_path_multi(CurrentNodes, ResetMoves, PartialPathLength),
+    next_moves([], ResetMoves),
+    follow_path_multi(CurrentNodes, ResetMoves, PartialPathLength),
     PathLength is PartialPathLength.
 follow_path_multi(CurrentNodes, [CurrMove|RemainingMoves], PathLength) :-
     is_left_move(CurrMove),
