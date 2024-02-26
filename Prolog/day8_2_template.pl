@@ -62,13 +62,13 @@ follow_path_multi(CurrentNodes, [], PathLength) :-
     PathLength is PartialPathLength.
 follow_path_multi(CurrentNodes, [CurrMove|RemainingMoves], PathLength) :-
     is_left_move(CurrMove),
-    \+ forall(member(CurrNode, CurrentNodes), left(CurrNode, CurrNode)),
+    \+ forall(member(CurrNode, CurrentNodes), left(CurrNode, CurrNode)) -> !,	% Greatly reduce choice points due to cut '!'
     advance_nodes(CurrentNodes, left, LeftAdvancedNodes),
     follow_path_multi(LeftAdvancedNodes, RemainingMoves, PartialPathLength),
     PathLength is PartialPathLength + 1.
 follow_path_multi(CurrentNodes, [CurrMove|RemainingMoves], PathLength) :-
     is_right_move(CurrMove),
-    \+ forall(member(CurrNode, CurrentNodes), right(CurrNode, CurrNode)),
+    \+ forall(member(CurrNode, CurrentNodes), right(CurrNode, CurrNode)) -> !,	% Greatly reduce choice points due to cut '!'
     advance_nodes(CurrentNodes, right, RightAdvancedNodes),
     follow_path_multi(RightAdvancedNodes, RemainingMoves, PartialPathLength),
     PathLength is PartialPathLength + 1.
