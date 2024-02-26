@@ -2,9 +2,19 @@
 
 For this part of the assignment, **3 questions** out of 25 unique questions of the AoC 2023 questions should be solved in Prolog. The questions solved in Prolog may not be submitted for the Haskell assignment as well.
 
+# Useful Links
+
+This section lists links to useful resources:
+
+* [Prolog basics](https://www.youtube.com/playlist?list=PLEvH6T-1oh75UagVp5BqeOVageBljdmaC)
+* [Memory & Choice points](https://www.youtube.com/watch?v=xABsTV8kuGE)
+* ["The Power of Prolog"](https://www.metalevel.at/prolog/introduction)
+
+
 # Solutions
 
 This section details the solutions to the chosen AoC questions for Prolog. However, additional information should only be expected if the solution is non-trivial to verify or understand.
+
 
 ## AoC Day 8
 
