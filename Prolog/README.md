@@ -47,27 +47,6 @@ The reachability predicate alone solves for part 1 of the question. The solution
 
 ### Parts 1 & 2: Queries
 
-To extract the answer to part 1 of the problem, a query of the following form should be run in the SWI Prolog web app when using the [day8_1.pl](/Prolog/day8_1.pl) code file:
-
-```Prolog
-?- follow_path(aaa, [], StepCount)
-```
-
-where `StepCount` resolves to the amount of steps to reach `zzz` from `aaa` using the required movement pattern. The code has hardcoded into it that `zzz` is the final destination.
-
-### Part 2: Query
-
-To extract the answer to part 2 of the problem, a query of the following form should be ran in the SWI Prolog web app when using the [day8_2.pl](/Prolog/day8_2.pl) code file:
-
-```Prolog
-?- get_start_atoms(StartAtoms),
-   follow_path_multi(StartAtoms, [], StepCount)
-```
-
-
-
-
-
 The following code block shows how to solve for the solutions of parts 1 and 2 respectively.
 
 
