@@ -45,6 +45,26 @@ The Prolog code file, [day8.pl](/Prolog/day8.pl), contains three major component
 
 The reachability predicate alone solves for part 1 of the question. The solution for part 2 builds upon this predicate.
 
+### Bash
+
+To ease the execution of the prolog code, and for the sake of reproducibility, a bash script is included. The script can be run to solve for both part 1 and part 2 simultaneously.
+
+For more information on which queries exactly are needed to solve parts 1 & 2, see [the next section](#parts-1--2-queries).
+
+```sh
+chmod +x day8.sh
+./day8.sh
+```
+
+The output looks something like this:
+
+```
+part 1: xxx
+part 2: yyy
+```
+
+where `xxx` and `yyy` represent some numbers, i.e. the solutions to part 1 and part 2 respectively.
+
 ### Parts 1 & 2: Queries
 
 The following code block shows how to solve for the solutions of parts 1 and 2 respectively.
