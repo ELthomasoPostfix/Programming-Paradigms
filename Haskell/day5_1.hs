@@ -4,7 +4,7 @@ import Data.List
 
 
 main = do
-    contents <- readFile "day5_test.txt"
+    contents <- readFile "day5.txt"
     print (computeMinLocation contents)
     return ()
 
