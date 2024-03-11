@@ -5,7 +5,8 @@ import Data.List
 
 main = do
     contents <- readFile "day5.txt"
-    print (computeMinLocation contents)
+    putStrLn ("part 1: " ++ show (computeMinLocation contents seedsAsSingles))
+    putStrLn ("part 2: " ++ show (computeMinLocation contents seedsAsDoubles))
     return ()
 
 
@@ -26,6 +27,14 @@ parseNumList (head:xs) numCarry
     | isDigit head   = parseNumList xs (numCarry ++ (head:""))
     | numCarry == "" = parseNumList xs numCarry
     | head == ' '    = (read numCarry) : (parseNumList xs "")
+
+
+-- Transform a list of elements into a list of pairs.
+-- The input list is REQUIRED to be of event length.
+pairify :: [x] -> [(x, x)]
+pairify [] = []
+pairify lst@(head1:head2:lxs) = (head1, head2) : (pairify lxs)
+pairify _ = error "Cannot pairify a list of uneven length"
 
 
 -- Split the splitRange param into a pair of lists:
@@ -76,13 +85,6 @@ transformByRange range@(rangeStartDest, rangeStartSrc, rangelen) (lrange@(lrange
           transformedRanges = [ (rangeStartDest + relRanMin - rangeStartSrc, relRanLen) | (relRanMin, relRanLen) <- toTransform ]
           (untransformedElems, transformedElems) = transformByRange range lrxs
 
--- Transform a list of elements into a list of pairs.
--- The input list is REQUIRED to be of event length.
-pairify :: [x] -> [(x, x)]
-pairify [] = []
-pairify lst@(head1:head2:lxs) = (head1, head2) : (pairify lxs)
-pairify _ = error "Cannot pairify a list of uneven length"
-
 
 -- A seed range is a tuple = (seed range start, seed range length).
 -- Params:
@@ -91,8 +93,6 @@ pairify _ = error "Cannot pairify a list of uneven length"
 --      3) The list of intermediate seed ranges that have that HAVE been transformed using a range mapping
 computeLocations :: [String] -> [(Int, Int)] -> [(Int, Int)] -> [(Int, Int)]
 computeLocations [] untransformedElems transformedElems = untransformedElems ++ transformedElems
-computeLocations (('s':'e':'e':'d':'s':':':seedLst):ignore:lxs) _ _ = computeLocations lxs seedRanges []  -- This SHOULD be the entry point; every input file starts with a seed line
-                                                                      where seedRanges = pairify (parseNumList seedLst "")
 computeLocations (lhead:lxs) untransformedElems transformedElems
     | isMapEnd    = computeLocations lxs (untransformedElems ++ transformedElems) []   -- The untransformed elements did not fit any range, map them one to one to a transformed value
     | isRangeLine = computeLocations lxs remainingUntransformed (addedTransformed ++ transformedElems)     -- Use range mapping to transform some elements; other range input lines may still follow this one
@@ -102,8 +102,30 @@ computeLocations (lhead:lxs) untransformedElems transformedElems
           (rsdest:rssrc:rangelen:[]) = parseNumList lhead "" -- Each range line consists of EXACTLY 3 numbers (destination range start, source range start, range length) = (rsdest, rangeStartSrc, rangelen)
           (remainingUntransformed, addedTransformed) = transformByRange (rsdest, rssrc, rangelen) untransformedElems
 
+-- Parse the very first input line, containing the seeds numbers, into a list
+-- of ranges suitable for part 1 of AoC day 5. Each seed will be mapped to
+-- a range of length 0, meaning the range contains only the seed itself; (seed, 0).
+-- Params:
+--      1) The first line of the input
+seedsAsSingles :: String -> [(Int, Int)]
+seedsAsSingles ('s':'e':'e':'d':'s':':':seedLst) = map (\seed -> (seed, 0)) (parseNumList seedLst "")
+
+-- Parse the very first input line, containing the seeds numbers, into a list
+-- of ranges suitable for part 2 of AoC day 5. Each pair of seeds will be mapped to
+-- a range, where the first seed is the range start and the second seed the range
+-- length; (seed1, seed2) = (rangeStart, rangeLen).
+-- Params:
+--      1) The first line of the input
+seedsAsDoubles :: String -> [(Int, Int)]
+seedsAsDoubles ('s':'e':'e':'d':'s':':':seedLst) = pairify (parseNumList seedLst "")
+
+
 -- Compute the smallest seed location given the input file.
+-- This SHOULD be the entry point; every input file starts with a seed line
 -- Params:
 --      1) The input file as a String
-computeMinLocation :: String -> Int
-computeMinLocation input = minimum (map (\(seedRangeMin, _) -> seedRangeMin) (computeLocations (lines input) [] []))
+--      2) The method to parse the seeds line into the appropriate seed ranges
+computeMinLocation :: String -> (String -> [(Int, Int)]) -> Int
+computeMinLocation input seedParser = minimum (map (\(seedRangeMin, _) -> seedRangeMin) (computeLocations mapInputLines initialRanges []))
+                                      where (seedsLine:_:mapInputLines) = lines input
+                                            initialRanges = seedParser seedsLine
