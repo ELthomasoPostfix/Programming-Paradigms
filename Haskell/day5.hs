@@ -10,9 +10,9 @@ main = do
     return ()
 
 
---------------------
---     PART 2     --
---------------------
+-------------------------
+--     PARTS 1 & 2     --
+-------------------------
 
 -- Parse a String representing list of space-separated
 -- numbers into an actual list of the corresponding Int values.
@@ -56,15 +56,21 @@ pairify _ = error "Cannot pairify a list of uneven length"
 --      2) The range to determine overlap with
 splitRangeByOverlap :: (Int, Int) -> (Int, Int) -> ([(Int, Int)], [(Int, Int)])
 splitRangeByOverlap splitRange@(splitMin, splitLen) referenceRange@(refMin, refLen)
-    | splitMax < refMin = ([], [splitRange])  -- case: [ ] { } = No overlap, the split range is located entirely left of the reference range
-    | refMax < splitMin = ([], [splitRange])  -- case: { } [ ] = No overlap, the split range is located entirely right of the reference range
+    -- case: [ ] { } = No overlap, the split range is located entirely left of the reference range
+    | splitMax < refMin = ([], [splitRange])
+    -- case: { } [ ] = No overlap, the split range is located entirely right of the reference range
+    | refMax < splitMin = ([], [splitRange])
     | (refMin <= splitMax) && (splitMax <= refMax) =
         if splitMin < refMin
-        then ([(refMin, splitMax - refMin + 1)], [leftNonOverlap])       -- case: [ { ] } = partial overlap, right side of split range overlaps, left side does not
-        else ([splitRange], [])                                          -- case: { [ ] } = complete overlap, enveloped by ref, entire split range overlaps
+        -- case: [ { ] } = partial overlap, right side of split range overlaps, left side does not
+        then ([(refMin, splitMax - refMin + 1)], [leftNonOverlap])
+        -- case: { [ ] } = complete overlap, enveloped by ref, entire split range overlaps
+        else ([splitRange], [])
+    -- case: { [ } ] = partial overlap, left side of split range overlaps, right side does not; envelopment case is already checked previously
     | (refMin <= splitMin) && (splitMin <= refMax) =
-        ([(splitMin, refMax - splitMin + 1)], [rightNonOverlap])         -- case: { [ } ] = partial overlap, left side of split range overlaps, right side does not; envelopment case is already checked previously
-    | otherwise = ([referenceRange], [leftNonOverlap, rightNonOverlap])  -- case: [ { } ] = partial overlap, ref enveloped by split, three subranges are generated: [ { AND { } AND } ], where only { } is seen as overlap
+        ([(splitMin, refMax - splitMin + 1)], [rightNonOverlap])
+    -- case: [ { } ] = partial overlap, ref enveloped by split, three subranges are generated: [ { AND { } AND } ], where only { } is seen as overlap
+    | otherwise = ([referenceRange], [leftNonOverlap, rightNonOverlap])
     where splitMax = splitMin + splitLen - 1
           refMax   = refMin + refLen - 1
           leftNonOverlap = (splitMin, refMin - splitMin)
@@ -94,12 +100,17 @@ transformByRange range@(rangeStartDest, rangeStartSrc, rangelen) (lrange@(lrange
 computeLocations :: [String] -> [(Int, Int)] -> [(Int, Int)] -> [(Int, Int)]
 computeLocations [] untransformedElems transformedElems = untransformedElems ++ transformedElems
 computeLocations (lhead:lxs) untransformedElems transformedElems
-    | isMapEnd    = computeLocations lxs (untransformedElems ++ transformedElems) []   -- The untransformed elements did not fit any range, map them one to one to a transformed value
-    | isRangeLine = computeLocations lxs remainingUntransformed (addedTransformed ++ transformedElems)     -- Use range mapping to transform some elements; other range input lines may still follow this one
-    | otherwise   = computeLocations lxs untransformedElems transformedElems        -- Ignore other input lines
+    -- The untransformed elements did not fit any range, map them one to one to a transformed value
+    | isMapEnd    = computeLocations lxs (untransformedElems ++ transformedElems) []
+    -- Use range mapping to transform some elements; other range input lines may still follow this one
+    | isRangeLine = computeLocations lxs remainingUntransformed (addedTransformed ++ transformedElems)
+    -- Ignore other input lines
+    | otherwise   = computeLocations lxs untransformedElems transformedElems
     where isMapEnd    = lhead == ""
-          isRangeLine = isDigit (head lhead)    -- Should only be used if the line is NOT the empty line
-          (rsdest:rssrc:rangelen:[]) = parseNumList lhead "" -- Each range line consists of EXACTLY 3 numbers (destination range start, source range start, range length) = (rsdest, rangeStartSrc, rangelen)
+          -- Should only be used if the line is NOT the empty line
+          isRangeLine = isDigit (head lhead)
+          -- Each range line consists of EXACTLY 3 numbers (destination range start, source range start, range length) = (rsdest, rangeStartSrc, rangelen)
+          (rsdest:rssrc:rangelen:[]) = parseNumList lhead ""
           (remainingUntransformed, addedTransformed) = transformByRange (rsdest, rssrc, rangelen) untransformedElems
 
 -- Parse the very first input line, containing the seeds numbers, into a list
