@@ -5,8 +5,36 @@ import Data.Char
 
 main = do
     contents <- readFile "day4.txt"
-    print (computeTotalValue (lines contents) [])
-    return ()
+    putStrLn ("part 1: " ++ show (computeTotalValueP1 contents))
+    putStrLn ("part 2: " ++ show (computeTotalValueP2 (lines contents) []))
+
+
+--------------------
+--     PART 1     --
+--------------------
+
+
+-- Compute the card value for a single input line that has its ':' prefix
+-- remove. i.e. a line of the form "num1 .. numx | num1 .. numy".
+-- Note that params 2 and 3 are strings in reversed order, to reduce '++' op use.
+-- Params:
+--      1) The input line, stripped of the prefix up until the ':' character
+--      2) All characters in the input left of the '|' in REVERSE, as a String
+--      3) All characters in the input right of the '|' in REVERSE, as a String
+--      4) A Bool that represents whether the '|' has been seen already in the input
+computeCardValue :: String ->  Int
+computeCardValue input = if overlap > 0
+                            then 2 ^ (overlap - 1)
+                            else 0
+                         where overlap = computeCardMatchAmnt input "" "" False
+
+
+-- Compute and add the card value per card.
+-- Params:
+--      1) The complete file input
+computeTotalValueP1 :: String -> Int
+computeTotalValueP1 "" = 0
+computeTotalValueP1 input = sum (map (\line -> computeCardValue (snd (extractLinePrefix line ""))) (lines input))
 
 
 --------------------
@@ -17,15 +45,17 @@ main = do
 -- numbers into an actual list of the corresponding Int values.
 -- Params:
 --      1) The string representing a list of space-separated Ints
---      2) A value carries through recursive calls, to keep track
---         of the current, incomplete Int substring
-parseNumList :: String -> String -> [Int]
-parseNumList "" "" = []
-parseNumList "" numCarry = [read numCarry]
-parseNumList (head:xs) numCarry
-    | isDigit head   = parseNumList xs (numCarry ++ (head:""))
-    | numCarry == "" = parseNumList xs numCarry
-    | head == ' '    = (read numCarry) : (parseNumList xs "")
+parseNumList :: String -> [Int]
+parseNumList str = foldl aggregateNumList [0] str
+
+-- A foldl aggregator that maps a space seperated list of numbers to a list of the corresponding Ints.
+-- Must be seeded with a [0] value. The input may not contain trailing spaces.
+aggregateNumList :: [Int] -> Char -> [Int]
+aggregateNumList aggregator@(partialNum : finishedNums) char
+    -- A number is a linear sum of its digits: 314 = 3*10^2 + 1*10^1 + 4*10^0
+    | isDigit char                    = ((partialNum*10 + read (char:"")) : finishedNums)
+    | partialNum /= 0 && char == ' '  = (0 : aggregator)
+    | otherwise                       = aggregator
 
 -- Compute the the size of the win-guess overlap for a single input line
 -- that has its ':' prefix removed.
@@ -37,12 +67,15 @@ parseNumList (head:xs) numCarry
 --      4) A Bool that represents whether the '|' has been seen already in the input
 computeCardMatchAmnt :: String -> String -> String -> Bool -> Int
 computeCardMatchAmnt "" pipeLeft pipeRight _ = length (intersect winNums gotNums)
-                                    where winNums = parseNumList pipeLeft ""
-                                          gotNums = parseNumList pipeRight ""
+                                    where winNums = parseNumList (reverse pipeLeft)
+                                          gotNums = parseNumList (reverse pipeRight)
 computeCardMatchAmnt (head:xs) pipeLeft pipeRight pipeSeen
+    -- Mark pipe as seen
     | head == '|' = computeCardMatchAmnt xs pipeLeft pipeRight True
-    | pipeSeen    = computeCardMatchAmnt xs pipeLeft (pipeRight ++ (head:"")) pipeSeen
-    | otherwise   = computeCardMatchAmnt xs (pipeLeft ++ (head:"")) pipeRight pipeSeen
+    -- pipe seen, char belongs to winning numbers
+    | pipeSeen    = computeCardMatchAmnt xs pipeLeft (head : pipeRight) pipeSeen
+    -- pipe NOT seen, char belongs to chosen numbers
+    | otherwise   = computeCardMatchAmnt xs (head : pipeLeft) pipeRight pipeSeen
 
 -- Strip the "Card x:" prefix off the line and return (Card ID, stripped line).
 -- Params:
@@ -51,8 +84,8 @@ computeCardMatchAmnt (head:xs) pipeLeft pipeRight pipeSeen
 --         of the current, incomplete card ID substring
 extractLinePrefix :: String -> String -> (Int, String)
 extractLinePrefix (head:xs) idCarry
-    | head == ':'  = (read idCarry, xs)
-    | isDigit head = extractLinePrefix xs (idCarry ++ (head:""))
+    | head == ':'  = (read (reverse idCarry), xs)
+    | isDigit head = extractLinePrefix xs (head:idCarry)
     | otherwise    = extractLinePrefix xs idCarry
 
 -- Compute the list of copies that the given Card generates.
@@ -102,11 +135,11 @@ updateCopyAmnts tuples@(thead:txs) (pchead:pcxs)
 --      1) A list of all individual lines, ordered by Card ID in ascending order (low to high)
 --      2) A list of (Card ID, copy amount) tuples, which functions as the list of pending
 --         Card's amount of copies generated to date
-computeTotalValue :: [String] -> [(Int, Int)] -> Int
-computeTotalValue [] copyAggregates = 0 -- Cards will never make you copy a card past the end of the table.
-computeTotalValue (line:lxs) copyAggregates
-    | copiesIDs == []              = thisCopyAmnt + (computeTotalValue lxs selectedAggregates)
-    | otherwise                    = thisCopyAmnt + (computeTotalValue lxs (updateCopyAmnts copyAmnts selectedAggregates))
+computeTotalValueP2 :: [String] -> [(Int, Int)] -> Int
+computeTotalValueP2 [] copyAggregates = 0 -- Cards will never make you copy a card past the end of the table.
+computeTotalValueP2 (line:lxs) copyAggregates
+    | copiesIDs == []              = thisCopyAmnt + (computeTotalValueP2 lxs selectedAggregates)
+    | otherwise                    = thisCopyAmnt + (computeTotalValueP2 lxs (updateCopyAmnts copyAmnts selectedAggregates))
     where (id,copiesIDs) = computeCopies line
           (cahead:caxs) = if copyAggregates /= []
                           then copyAggregates
