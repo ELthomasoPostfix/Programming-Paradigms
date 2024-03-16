@@ -16,12 +16,8 @@ main = do
 
 -- Compute the card value for a single input line that has its ':' prefix
 -- remove. i.e. a line of the form "num1 .. numx | num1 .. numy".
--- Note that params 2 and 3 are strings in reversed order, to reduce '++' op use.
 -- Params:
 --      1) The input line, stripped of the prefix up until the ':' character
---      2) All characters in the input left of the '|' in REVERSE, as a String
---      3) All characters in the input right of the '|' in REVERSE, as a String
---      4) A Bool that represents whether the '|' has been seen already in the input
 computeCardValue :: String ->  Int
 computeCardValue input = if overlap > 0 then value else 0
                          where overlap = computeCardMatchAmnt input "" "" False
