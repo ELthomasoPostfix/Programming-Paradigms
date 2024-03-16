@@ -20,7 +20,7 @@ main = do
 --      1) The input line, stripped of the prefix up until the ':' character
 computeCardValue :: String ->  Int
 computeCardValue input = if overlap > 0 then value else 0
-                         where overlap = computeCardMatchAmnt input "" "" False
+                         where overlap = computeCardMatchAmnt input ""
                                value = 2 ^ (overlap - 1)
 
 
@@ -49,6 +49,7 @@ aggregateNumList :: [Int] -> Char -> [Int]
 aggregateNumList aggregator@(partialNum : finishedNums) char
     -- A number is a linear sum of its digits: 314 = 3*10^2 + 1*10^1 + 4*10^0
     | isDigit char                    = ((partialNum*10 + read (char:"")) : finishedNums)
+    -- Whitespace after number found, append new placeholder 0 for next number
     | partialNum /= 0 && char == ' '  = (0 : aggregator)
     | otherwise                       = aggregator
 
@@ -58,19 +59,12 @@ aggregateNumList aggregator@(partialNum : finishedNums) char
 -- Params:
 --      1) The input line, stripped of the prefix up until the ':' character
 --      2) All characters in the input left of the '|', as a String
---      3) All characters in the input right of the '|', as a String
---      4) A Bool that represents whether the '|' has been seen already in the input
-computeCardMatchAmnt :: String -> String -> String -> Bool -> Int
-computeCardMatchAmnt "" pipeLeft pipeRight _ = length (intersect winNums gotNums)
-                                    where winNums = parseNumList (reverse pipeLeft)
-                                          gotNums = parseNumList (reverse pipeRight)
-computeCardMatchAmnt (head:xs) pipeLeft pipeRight pipeSeen
-    -- Mark pipe as seen
-    | head == '|' = computeCardMatchAmnt xs pipeLeft pipeRight True
-    -- pipe seen, char belongs to winning numbers
-    | pipeSeen    = computeCardMatchAmnt xs pipeLeft (head : pipeRight) pipeSeen
-    -- pipe NOT seen, char belongs to chosen numbers
-    | otherwise   = computeCardMatchAmnt xs (head : pipeLeft) pipeRight pipeSeen
+computeCardMatchAmnt :: String -> String -> Int
+computeCardMatchAmnt (head:xs) pipeLeft
+    | head == '|' = length (intersect winNums gotNums)
+    | otherwise   = computeCardMatchAmnt xs (head : pipeLeft)
+    where winNums = parseNumList (reverse pipeLeft)
+          gotNums = parseNumList xs
 
 -- Strip the "Card x:" prefix off the line and return (Card ID, stripped line).
 -- Params:
@@ -90,7 +84,7 @@ extractLinePrefix (head:xs) idCarry
 computeCopies :: String -> (Int, [Int])
 computeCopies line = (id, [id + 1, id + 2 .. id + copyAmnt])
              where (id,numStr) = extractLinePrefix line ""
-                   copyAmnt = computeCardMatchAmnt numStr "" "" False
+                   copyAmnt = computeCardMatchAmnt numStr ""
 
 -- Update the copy amount value for the given ID in the list of
 -- yet-to-process/pending Cards.
