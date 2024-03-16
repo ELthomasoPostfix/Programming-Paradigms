@@ -23,10 +23,9 @@ main = do
 --      3) All characters in the input right of the '|' in REVERSE, as a String
 --      4) A Bool that represents whether the '|' has been seen already in the input
 computeCardValue :: String ->  Int
-computeCardValue input = if overlap > 0
-                            then 2 ^ (overlap - 1)
-                            else 0
+computeCardValue input = if overlap > 0 then value else 0
                          where overlap = computeCardMatchAmnt input "" "" False
+                               value = 2 ^ (overlap - 1)
 
 
 -- Compute and add the card value per card.
