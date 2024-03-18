@@ -1,17 +1,13 @@
-
-
-
 main = do
     contents <- readFile "day3.txt"
     -- Part 1: Compute nr of ways in which to beat the records
-    let solutions = computeIndivSolutionsP1 (lines contents)
+    let solutions = computeIndivSolutions (lines contents) parseNumList
         result = product solutions
-        in putStrLn ("part 1: " ++ (show result) ++ "  " ++ (show solutions))
+        in putStrLn ("part 1: " ++ (show result) ++ "\t  " ++ (show solutions))
     -- Part 2: Compute kerned nr of ways in which to beat the records
-    let result = computeSolutionP2 (lines contents)
-        in putStrLn ("part 2: " ++ (show result))
-
-
+    let solutions = computeIndivSolutions (lines contents) kernedParse
+        result = product solutions
+        in putStrLn ("part 2: " ++ (show result) ++ "  " ++ (show solutions))
 
 
 -------------------------
@@ -24,6 +20,14 @@ main = do
 --      1) The string representing a list of space-separated Ints
 parseNumList :: String -> [Int]
 parseNumList str = foldl (\lst word -> ((read word::Int) : lst)) [] (words str)
+
+-- Parse a String representing list of kerned, space-separated
+-- numbers into an actual list of the one corresponding, non-kerned Int.
+-- i.e. " 12 34 " -> 1234, see https://en.wikipedia.org/wiki/Kerning
+-- Params:
+--      1) The string representing a list of kerned, space-separated Ints
+kernedParse :: String -> [Int]
+kernedParse str = [read $ concat $ words str]
 
 -- Split the string once on the given character, and return both parts.
 -- Params:
@@ -59,16 +63,18 @@ solveQuadEq distance raceTime =
           solFloor = ((-r) + sqrt disc) / div
           solCeil  = ((-r) - sqrt disc) / div
 
-computeIndivSolutionsP1 :: [String] -> [Int]
-computeIndivSolutionsP1 (timeLine:distLine:[]) =
-    map (\(solFloor, solCeil) -> solCeil - solFloor + 1) indivSols
-    where times = parseNumList (snd (splitOnce ':' timeLine))
-          dists = parseNumList (snd (splitOnce ':' distLine))
-          indivSols = zipWith solveQuadEq dists times
-
-computeSolutionP2 :: [String] -> Int
-computeSolutionP2 (timeLine:distLine:[]) =
-    solCeil - solFloor + 1
-    where kernedTime = read (concat (words (snd (splitOnce ':' timeLine))))
-          kernedDist = read (concat (words (snd (splitOnce ':' distLine))))
-          (solFloor, solCeil) = solveQuadEq kernedDist kernedTime
+-- Compute the number of ways to win each individual race.
+-- Params:
+--      1) A list containing exactly the two input lines: "Time:" & "Distance:"
+--      2) The method used to parse the space-separated number substring of
+--      both lines. i.e. parseMethod "12 34 56" -> [12, 34, 56]. One solution
+--      is computed and returned for each pair of parsed, associated time & distance lists
+computeIndivSolutions :: [String] -> (String -> [Int]) -> [Int]
+computeIndivSolutions (timeLine:distLine:[]) parseMethod =
+    -- Find the number of ways to win each race
+    map (\(solFloor, solCeil) -> solCeil - solFloor + 1) partialSols
+          -- Parse the input lines into associative Time & Distance lists
+    where times = parseMethod (snd (splitOnce ':' timeLine))
+          dists = parseMethod (snd (splitOnce ':' distLine))
+          -- Solve the for the two press times that achieve the given distance for each race
+          partialSols = zipWith solveQuadEq dists times
