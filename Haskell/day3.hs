@@ -4,12 +4,13 @@
 main = do
     contents <- readFile "day3.txt"
     -- Part 1: Compute nr of ways in which to beat the records
-    let solutions = computeIndivSolutions (lines contents)
+    let solutions = computeIndivSolutionsP1 (lines contents)
         result = product solutions
         in putStrLn ("part 1: " ++ (show result) ++ "  " ++ (show solutions))
-    -- Part 2: Compute ...
+    -- Part 2: Compute kerned nr of ways in which to beat the records
+    let result = computeSolutionP2 (lines contents)
+        in putStrLn ("part 2: " ++ (show result))
 
-    return ()
 
 
 
@@ -58,11 +59,16 @@ solveQuadEq distance raceTime =
           solFloor = ((-r) + sqrt disc) / div
           solCeil  = ((-r) - sqrt disc) / div
 
-computeIndivSolutions :: [String] -> [Int]
-computeIndivSolutions (timeLine:distLine:[]) =
-    -- error (show indivSols)
-    -- foldl (\aggr (solFloor, solCeil) -> aggr * (solCeil - solFloor + 1)) 1 indivSols
+computeIndivSolutionsP1 :: [String] -> [Int]
+computeIndivSolutionsP1 (timeLine:distLine:[]) =
     map (\(solFloor, solCeil) -> solCeil - solFloor + 1) indivSols
     where times = parseNumList (snd (splitOnce ':' timeLine))
           dists = parseNumList (snd (splitOnce ':' distLine))
           indivSols = zipWith solveQuadEq dists times
+
+computeSolutionP2 :: [String] -> Int
+computeSolutionP2 (timeLine:distLine:[]) =
+    solCeil - solFloor + 1
+    where kernedTime = read (concat (words (snd (splitOnce ':' timeLine))))
+          kernedDist = read (concat (words (snd (splitOnce ':' distLine))))
+          (solFloor, solCeil) = solveQuadEq kernedDist kernedTime
