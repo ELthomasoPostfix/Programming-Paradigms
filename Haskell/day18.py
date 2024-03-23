@@ -50,7 +50,7 @@ def dir_to_coords(cc, dir, dist):
     return [i for i in zip(xCoords, yCoords)]
 
 
-f = open("./day182.txt")
+f = open("./day18.txt")
 coords = []
 currPos = (0, 0)
 for line in f:
@@ -80,6 +80,3 @@ image = numpy.zeros((Y, X, 3), dtype=numpy.uint8)
 for idx, col in zip(zip(ys, xs), colors):
     image[idx] = col
 imageio.imwrite('day18.png', image)
-
-#plt.scatter(xs, ys)
-#plt.savefig('day18.png')
