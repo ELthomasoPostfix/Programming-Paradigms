@@ -1,0 +1,1 @@
+runhaskell day18.hs
