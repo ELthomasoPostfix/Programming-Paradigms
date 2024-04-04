@@ -4,7 +4,7 @@
 
 % Parse the input and establish establish the grid coordinates for each marking and number.
 :- dynamic(num_coordinates/2).
-:- dynamic(mark_coordinates/1).
+:- dynamic(mark_coordinates/2).
 :- dynamic(line_nr/1).
 
 
@@ -62,8 +62,8 @@ assert_number_coordinates((Number, Xstart, Xend, Y), _, _) :-
     assertz(num_coordinates(Number, (Xstart, Xend, Y))).
 
 % A foldl accumulator to assert marker coordinates as facts.
-assert_marking_coordinates(Coordinates, _, _) :-
-    assertz(mark_coordinates(Coordinates)).
+assert_marking_coordinates((Mark, Xmark, Ymark), _, _) :-
+    assertz(mark_coordinates(Mark, (Xmark, Ymark))).
 
 
 
@@ -91,7 +91,7 @@ num_list(Xcurrent, Ycurrent, [(NumberAtom, Xstart, Xend, Ycurrent) | NumsCoordsP
     { atomic_list_concat(Number, NumberAtom) },
     num_list(Xnext, Ycurrent, NumsCoordsPartial, MarksCoords).
 % Recursive case: num_list = whitespace marking num_list
-num_list(Xcurrent, Ycurrent, NumsCoords, [(Xmark, Ycurrent) | MarksCoordsPartial]) -->
+num_list(Xcurrent, Ycurrent, NumsCoords, [(Marking, Xmark, Ycurrent) | MarksCoordsPartial]) -->
     whitespace(WSLength), [Marking],
 
     { Marking \= '.' },
@@ -122,7 +122,7 @@ marked_num(Number) :-
 % Check if the rectangle defined by the points (Xstart-1, Y-1) and (Xend+1, Y+1)
 % contains any marking character.
 contains_mark(Xstart, Xend, Y) :-
-    mark_coordinates((Xmark, Ymark)),
+    mark_coordinates(_, (Xmark, Ymark)),
     (eval(Xstart - 1) =< Xmark), (Xmark =< eval(Xend + 1)),
     (eval(Y - 1)      =< Ymark), (Ymark =< eval(Y + 1)),
     % Explicitly CUT because only the first neighbouring mark should
