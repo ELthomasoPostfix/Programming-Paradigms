@@ -116,12 +116,16 @@ marked_sum(Sum) :-
 % Find numbers neighboured by any mark at all.
 marked_num(Number) :-
     num_coordinates(Number, NumCoords),
-    contains_mark(_, NumCoords).
+    contains_mark(_, _, NumCoords).
 
 
 % Check if the rectangle defined by the points (Xstart-1, Y-1) and (Xend+1, Y+1)
 % contains any marking character.
-contains_mark(Mark, (Xstart, Xend, Y)) :-
+% Params:
+%       1) Mark atom
+%       2) Mark coordinates as a tuple (X, Y)
+%       3) The number range around which to look for the mark as (Xstart, Xend, Y)
+contains_mark(Mark, (Xmark, Ymark), (Xstart, Xend, Y)) :-
     mark_coordinates(Mark, (Xmark, Ymark)),
     (eval(Xstart - 1) =< Xmark), (Xmark =< eval(Xend + 1)),
     (eval(Y - 1)      =< Ymark), (Ymark =< eval(Y + 1)),
