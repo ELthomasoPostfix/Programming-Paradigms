@@ -5,7 +5,8 @@ swipl -s day3 -g "
 marked_sum(Sum),
 format('part 1: ~w\n', [Sum]),
 
-gear_ration_sum(Sum2),
+format('please wait +/- 2 min, part 2 is coming ...\n', []),
+gear_ratio_sum(Sum2),
 format('part 2: ~w\n', [Sum2]),
 
 halt.

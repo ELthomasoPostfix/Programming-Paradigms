@@ -109,8 +109,8 @@ num_list(_, _, [], []) -->
 
 % Get the sum of all marked numbers.
 marked_sum(Sum) :-
-  findall(Num, (marked_num(NumAtom), atom_number(NumAtom, Num)), MarkedNums),
-  foldl(plus, MarkedNums, 0, Sum).
+    findall(Num, (marked_num(NumAtom), atom_number(NumAtom, Num)), MarkedNums),
+    foldl(plus, MarkedNums, 0, Sum).
 
 
 % Find numbers neighboured by any mark at all.
@@ -135,7 +135,33 @@ contains_mark(Mark, (Xmark, Ymark), (Xstart, Xend, Y)) :-
     !.
 
 
-gear_ration_sum(Sum) :- Sum is 0.
+% Get the sum of all gear ratios.
+gear_ratio_sum(Sum) :-
+    findall(Ratio, gear_ratio(Ratio), GearRatios),
+    foldl(plus, GearRatios, 0, SymmetricSum),
+    % The `gear_ratio` predicate finds the ratio for both
+    % (Num1=a, Num2=b) AND (Num1=b, Num2=a), so divide by two.
+    Sum is SymmetricSum div 2.
 
 
+% Find the gear ratio of '*' marks neighboured by exatly two numbers.
+gear_ratio(Ratio) :-
+    % Gather values
+    num_coordinates(Number1, NumCoords1),
+    num_coordinates(Number2, NumCoords2),
+    % Check requirements:
+    %   1) Number1 != Number2
+    %   2) The two numbers are next to te same '*', i.e. the same MarkCoords
+    %   3) There does not exist a Number3 that is also next to the same '*'/MarkCoords
+    NumCoords1 \= NumCoords2,
+    contains_mark('*', MarkCoords, NumCoords1),
+    contains_mark('*', MarkCoords, NumCoords2),
+    not(( num_coordinates(_, NumCoords3),
+          NumCoords1 \= NumCoords3, NumCoords2 \= NumCoords3,
+          contains_mark('*', MarkCoords, NumCoords3)
+    )),
+    % Compute results
+    atom_number(Number1, NumInt1),
+    atom_number(Number2, NumInt2),
+    Ratio is NumInt1 * NumInt2.
 
