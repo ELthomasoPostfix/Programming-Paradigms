@@ -19,7 +19,7 @@ increment_line_nr(NewLineNr) :-
     assertz(line_nr(NewLineNr)).
 
 
-% Dynamically asserts facts (movement pattern, L-R relations) based on the input file.
+% Dynamically asserts facts (number coordinates, marking coordinates) based on the input file.
 % Returns false event if it succeeds.
 generate_facts(File) :-
     reset_line_nr(),
