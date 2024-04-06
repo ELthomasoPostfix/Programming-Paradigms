@@ -5,15 +5,40 @@
 % Parse the input and establish establish the grid coordinates for each marking and number.
 % The set of garden coordinates; includes the start's coordinates
 :- dynamic(garden/1).
+% Garden dimensions, part 2 specifies the gardens repeat infinitely to all sides
+:- dynamic(garden_dimensions/2).
 % The start coordinates, exactly one start coordinate exists
 :- dynamic(start/1).
+
+
+% Assert garden cyclicity/infinity, a coordinate is a garden if
+% the corresponding coordinate in the input grid is a garden.
+garden_inf((X, Y)) :-
+    % The coordinate lies in the original grid dimensions
+    garden((X, Y));
+    % The coordinate lies in some multiple of the grid dimensions
+    garden_dimensions(Width, Length),
+    Xmod is X mod Width,
+    Ymod is Y mod Length,
+    garden((Xmod, Ymod)).
+
+% Treat all adjacent coordinates in the NESW compass directions as neighbours.
+neighbour((X, Y), (Xn, Yn)) :-
+    Xn is X - 1, Yn is Y;
+    Xn is X + 1, Yn is Y;
+    Xn is X    , Yn is Y - 1;
+    Xn is X    , Yn is Y + 1.
 
 
 % Dynamically asserts facts (garden plot locations) based on the input file.
 generate_facts(File) :-
     % Do file parsing
     findall(Chars, (file_line(File, Line), atom_chars(Line, Chars)), AllLines),
-    foldl(interpret_line, AllLines, 0, _).
+    foldl(interpret_line, AllLines, 0, LineCount),
+    % Assert garden dimensions
+    AllLines = [FirstLine | _],
+    length(FirstLine, LineWidth),
+    assertz(garden_dimensions(LineWidth, LineCount)).
 
 
 file_line(File, Line) :-
@@ -107,10 +132,16 @@ bfs_update([FringeHead | FringeRest], Expanded) :-
 neighbours((X, Y), Neighbors) :-
     findall((Xn, Yn), (
         % Generator: find all gardens (coordinates) that are strictly neighbors of the given garden (coordinates)
-        garden((Xn, Yn)),
-        EuclideanDistance is abs(X - Xn) + abs(Y - Yn),
-        EuclideanDistance == 1
+        neighbour((X, Y), (Xn, Yn)),
+        garden_inf_single((Xn, Yn))
     ), Neighbors).
+
+
+% Call `garden_inf` with a CUT, to ensure only a single garden's coords are returend.
+% When a coordinate falls in the original dimensions, both OR clauses evaluate to true
+% so that two results would be returned. This bloats the fringe unnecessarily.
+garden_inf_single(Garden) :- garden_inf(Garden), !.
+
 
 % Define a Set datastructure; a Set is a list where each element is unique, i.e. appears exactly once.
 set([], []).
