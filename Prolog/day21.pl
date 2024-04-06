@@ -103,7 +103,7 @@ bfs(Fringe, Depth, FinalFringe) :-
     RecDepth >= 0,
     % BFS logic
     bfs_update(Fringe, UpdatedFringe),
-    set(UpdatedFringe, UniqueFringe),
+    list_to_set(UpdatedFringe, UniqueFringe),
     bfs(UniqueFringe, RecDepth, FinalFringe).
 
 
@@ -141,12 +141,3 @@ neighbours((X, Y), Neighbors) :-
 % When a coordinate falls in the original dimensions, both OR clauses evaluate to true
 % so that two results would be returned. This bloats the fringe unnecessarily.
 garden_inf_single(Garden) :- garden_inf(Garden), !.
-
-
-% Define a Set datastructure; a Set is a list where each element is unique, i.e. appears exactly once.
-set([], []).
-% Ensure that the resulting Set is finite:
-%   set([1, 1], Set), Set = [1] instead of Set = [1|_]
-set([], Unique) :- append(Unique, [], Unique).
-set([Elem | Rest], [Elem | UniquePartial]) :- \+ memberchk(Elem, UniquePartial), set(Rest, UniquePartial), !.
-set([Elem | Rest], UniquePartial) :- memberchk(Elem, UniquePartial), set(Rest, UniquePartial), !.
