@@ -124,11 +124,11 @@ bfs_update([FringeHead | FringeRest], Expanded) :-
     !.
 
 
-% Define the neighbours relation: the coordinates that are at euclidean distance of
+% Define the neighbours relation: the coordinates that are at manhatten distance of
 % exactly 1 from the given coordinates and are marked as 'garden', are neighbours.
 % Params:
 %       1) Any (X, Y) coordinate, does not have to be a garden
-%       2) The list of garden coordinates at Euclidean distance 1
+%       2) The list of garden coordinates at manhatten distance 1
 neighbours((X, Y), Neighbors) :-
     findall((Xn, Yn), (
         % Generator: find all gardens (coordinates) that are strictly neighbors of the given garden (coordinates)
