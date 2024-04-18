@@ -7,8 +7,8 @@ bfs([StartCoord], 64, FinalFringe),
 length(FinalFringe, Len),
 format('part 1: ~w\n', [Len]),
 
-%recdepths_lcm(RecDepth_P2),
-%format('part 2: ~w\n', [RecDepth_P2]),
+solution3(26501365, Surface),
+format('part 2: ~w\n', [Surface]),
 
 halt.
 "
