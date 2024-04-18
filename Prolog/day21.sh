@@ -7,7 +7,7 @@ bfs([StartCoord], 64, FinalFringe),
 length(FinalFringe, Len),
 format('part 1: ~w\n', [Len]),
 
-solution3(26501365, Surface),
+solution(26501365, Surface),
 format('part 2: ~w\n', [Surface]),
 
 halt.
