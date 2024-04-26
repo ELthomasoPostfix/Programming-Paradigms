@@ -36,7 +36,8 @@ g(N) --> {M is N - 1},
 % Parse a given sierpinski sequence into a line/2 facts 
 sierpinski_svg --> lines(pi/2, 0-0).
 
-lines(Angle, X1-Y1) --> ([f]; [g]),
+lines(Angle, X1-Y1) -->
+  ([f] | [g]),
   { X2 is X1 + cos(Angle) * 10, Y2 is Y1 + sin(Angle) * 10 },
   { assertz(line(X1-Y1, X2-Y2)) },
   lines(Angle, X2-Y2).
@@ -44,7 +45,7 @@ lines(Angle, X1-Y1) --> ([f]; [g]),
 lines(Angle, Position) -->
   { AngleDelta is 2 * pi / 3 },
   (
-    pls, { AngleNew is Angle + AngleDelta };
+    pls, { AngleNew is Angle + AngleDelta } |
     min, { AngleNew is Angle - AngleDelta}
   ),
   lines(AngleNew, Position).
