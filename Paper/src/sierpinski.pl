@@ -1,3 +1,6 @@
+% Allows strings to be used as input to phrase/2
+:- set_prolog_flag(double_quotes, chars).
+
 % Each line in the drawn pattern is registered as a fact
 :- dynamic(line/2).
 
@@ -33,7 +36,30 @@ g(0) --> [g], !.
 g(N) --> {M is N - 1},
          g(M), g(M).
 
-% Parse a given sierpinski sequence into a line/2 facts 
+
+
+% Generate an iteration of the sierpinski pattern.
+% Each subsequent solution (unification) to this predicate
+% represents one depth deeper than the previous solution.
+sierpinski_rec("f-g-g").
+sierpinski_rec(Seq) :-
+  sierpinski_rec(Seq0),
+  phrase(swapall(SeqSep), Seq0),
+  append(SeqSep, Seq).
+
+swapall([]) --> [].
+swapall([F | Fs]) --> swap(F), swapall(Fs).
+swap("f-g+f+g-f") --> "f".
+swap("gg") --> "g".
+swap("+") --> "+".
+swap("-") --> "-".
+
+seq([]) --> [].
+seq([E | Es]) --> [E], seq(Es).
+
+
+
+% Parse a given sierpinski sequence into line/2 facts 
 sierpinski_svg --> lines(pi/2, 0-0).
 
 lines(Angle, X1-Y1) -->

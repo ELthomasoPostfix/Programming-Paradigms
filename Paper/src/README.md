@@ -8,7 +8,8 @@ This section details the usage, read calling conventions, of the examples provid
 
 ## abc
 
-Generate a sequence of the form $a^n b^n c^n$. The $n$ value can be optionally specified.
+Generate a sequence of the form $a^n b^n c^n$. Optional, positional parameters can be specified:
+1) The $n$ value; MUST be a positive integer $\geq 0$
 
 ```sh
 # Specify depth
@@ -20,7 +21,9 @@ Generate a sequence of the form $a^n b^n c^n$. The $n$ value can be optionally s
 
 ## Sierpinski
 
-Generate an SVG image for a sierpinski triangle L-system grammar. The recursion depth of the replacements can be optionally specified.
+Generate an SVG image for a sierpinski triangle L-system grammar. Optional, positional parameters can be specified:
+1) The recursion depth of the replacements; MUST be a positive integer $\geq 0$
+2) The sierpinski pattern implementation method; if $true$ then call the pure DCG implementation, if $false$ call the mixed DCG + predicate implementation
 
 ```sh
 # Specify depth
