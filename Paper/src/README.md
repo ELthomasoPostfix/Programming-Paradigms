@@ -6,6 +6,24 @@ This source code serves as an appendix to the Programming Paradigms paper assign
 
 This section details the usage, read calling conventions, of the examples provided here.
 
+## DCG syntax
+
+Generate sequences that showcase the basic syntax of DCGs in Prolog. Optional, positional parameters can be specified:
+1) The $X$ variable of the $head(X)$ definite clause; MUST _some_ or _a_
+
+```sh
+# Specify X
+./dcg_syntax.sh some
+
+# Allow default X assignment
+./dcg_syntax.sh
+```
+
+At the time of writing, three alternative calls of the $phrase$ predicate are done.
+1) Leave $X$ of $head(X)$ as a free variable
+2) Fill in $X$ of $head(X)$ with the script parameter
+3) Make use of an unnamed definite clause in the $phrase$ predicate call to add a second punctuation mark
+
 ## abc
 
 Generate a sequence of the form $a^n b^n c^n$. Optional, positional parameters can be specified:
