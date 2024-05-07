@@ -1,16 +1,12 @@
 OUT_PATH="sierpinski_completed.svg"
-REC_DEPTH=${1:-6}
-USE_DCG_IMPLEMENTATION=${2:-true}
+FRAGMENT=${1:-"f-g+f+g-f+gg-f-g+f+g-f-gggg+f-g+f+g-f-gg+f-g+f+g-f+gg-f-g+f+g-f+gggg-f-g+f+g-f-gg+f-g+f+g-f+gg-f-g+f+g-f-gggggggg+f-g+f+g-f-gg+f-g+f+g-f+gg-f-g+f+g-f-gggg+f-g+f+g-f-gg+f-g+f+g-f+gg-f-g+f+g-f+gggg-f-g+"}
 
-if ! [[ $REC_DEPTH =~ ^[0-9]+$ ]]; then
-    echo "The first, optional parameter MUST be an unsigned integer, got '$REC_DEPTH'";
+if ! [[ $FRAGMENT =~ ^[fg+-]+$ ]]; then
+    echo "The first, optional parameter MUST be any (possibly invalid) sierpinski pattern fragment (i.e. a sequence of the characters 'f', 'g', '+' and '-'), got '$Fragment'";
     exit 1;
 fi
 
-if ! [[ $USE_DCG_IMPLEMENTATION =~ ^(true)|(false)+$ ]]; then
-    echo "The second, optional parameter MUST be 'true' or 'false', got '$USE_DCG_IMPLEMENTATION'";
-    exit 1;
-fi
+
 
 swipl -s sierpinski -g "
 % Load ...//1 DC rule
@@ -21,7 +17,7 @@ between(0, 10, Depth),
 phrase(sierpinski(Depth), Pattern),
 
 % Define some valid fragment of a sierpinski pattern
-Fragment = \"g+f+g-f-g\",
+Fragment = \"$FRAGMENT\",
 
 % Match the containing pattern
 phrase((...(Prefix), Fragment, ...(Postfix)), Pattern),
@@ -33,7 +29,8 @@ format('
 Start Fragment:    ~w
 Recursion depth:   ~w
 Generated pattern: ~w
-', [FragAt, Depth, PatAt])
+image dump: ~w
+', [FragAt, Depth, PatAt, $OUT_PATH]),
 
 % Register all generated lines as facts
 retractall(line(_, _)),
