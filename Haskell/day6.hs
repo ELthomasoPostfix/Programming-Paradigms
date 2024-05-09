@@ -1,5 +1,5 @@
 main = do
-    contents <- readFile "day3.txt"
+    contents <- readFile "day6.txt"
     -- Part 1: Compute nr of ways in which to beat the records
     let solutions = computeIndivSolutions (lines contents) parseNumList
         result = product solutions

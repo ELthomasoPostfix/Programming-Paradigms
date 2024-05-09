@@ -1,1 +1,0 @@
-runhaskell day3.hs
